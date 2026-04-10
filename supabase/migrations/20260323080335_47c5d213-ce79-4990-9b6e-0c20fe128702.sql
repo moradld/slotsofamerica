@@ -1,0 +1,1 @@
+UPDATE public.payment_gateways SET deep_link = NULL WHERE id = '10cec206-4598-43ec-93bb-bb76cee65ee7';

@@ -1,0 +1,5 @@
+CREATE POLICY "Anon can read widget settings"
+ON public.app_settings
+FOR SELECT
+TO anon
+USING (key IN ('contact_display_mode', 'contact_button_label'));

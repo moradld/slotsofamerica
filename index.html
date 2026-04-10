@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Transparent 1x1 favicon to prevent browser requesting default /favicon.ico before preload -->
+    <link rel="icon" href="/favicon-soa.png" type="image/png" />
+    <title>Slots of America</title>
+    <meta name="description" content="" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      /* Hide everything until site settings are loaded to prevent flicker */
+      body:not(.settings-loaded) { opacity: 0; }
+      body.settings-loaded { opacity: 1; transition: opacity 0.15s ease-in; }
+    </style>
+    <script>
+      // Safety: reveal page after 3s even if preload fails
+      setTimeout(function(){ document.body.classList.add('settings-loaded'); }, 3000);
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

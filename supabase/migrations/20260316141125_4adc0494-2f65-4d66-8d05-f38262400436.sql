@@ -1,0 +1,1 @@
+UPDATE profiles SET email_verified = true, email_verified_at = now() WHERE email = 'journeytest2026@example.com';

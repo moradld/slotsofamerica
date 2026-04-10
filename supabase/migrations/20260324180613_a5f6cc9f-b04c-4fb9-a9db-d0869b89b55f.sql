@@ -1,0 +1,62 @@
+CREATE OR REPLACE FUNCTION public.request_game_access(_game_id uuid)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+  _user_id UUID;
+  _req_id UUID;
+  _username TEXT;
+  _email TEXT;
+  _admin RECORD;
+  _game_name TEXT;
+  _existing_status TEXT;
+BEGIN
+  _user_id := auth.uid();
+  IF _user_id IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF NOT check_rate_limit(_user_id, 'request_game_access', 5, 60) THEN
+    RAISE EXCEPTION 'Too many requests. Please wait.';
+  END IF;
+
+  SELECT name INTO _game_name FROM public.games WHERE id = _game_id AND is_active = true;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Game not found or inactive';
+  END IF;
+
+  SELECT status INTO _existing_status
+  FROM public.game_unlock_requests
+  WHERE user_id = _user_id AND game_id = _game_id;
+
+  IF _existing_status IS NOT NULL THEN
+    IF _existing_status = 'rejected' THEN
+      DELETE FROM public.game_unlock_requests
+      WHERE user_id = _user_id AND game_id = _game_id AND status = 'rejected';
+    ELSE
+      RAISE EXCEPTION 'You already have a request for this game';
+    END IF;
+  END IF;
+
+  SELECT p.username, u.email INTO _username, _email
+  FROM auth.users u
+  LEFT JOIN public.profiles p ON p.id = u.id
+  WHERE u.id = _user_id;
+
+  INSERT INTO public.game_unlock_requests (user_id, game_id, username, email, status)
+  VALUES (_user_id, _game_id, COALESCE(_username, 'unknown'), COALESCE(_email, 'unknown'), 'pending')
+  RETURNING id INTO _req_id;
+
+  FOR _admin IN SELECT user_id FROM public.user_roles WHERE role = 'admin'
+  LOOP
+    INSERT INTO public.notifications (user_id, title, message, type, category)
+    VALUES (_admin.user_id, 'New Game Access Request',
+      COALESCE(_username, 'A user') || ' requested access to ' || _game_name || '.',
+      'info', 'game_access');
+  END LOOP;
+
+  RETURN _req_id;
+END;
+$function$

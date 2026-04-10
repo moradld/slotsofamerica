@@ -1,0 +1,43 @@
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: "admin" | "manager" | "user";
+}
+
+export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { user, role, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  // "admin" requiredRole allows both admin and manager
+  if (requiredRole === "admin" && role !== "admin" && role !== "manager") {
+    return <Navigate to="/home" replace />;
+  }
+
+  // Manager-only allowed pages
+  if (requiredRole === "admin" && role === "manager") {
+    const managerAllowedPaths = ["/admin/games", "/admin/game-access", "/admin/transactions", "/admin/password-requests", "/admin/payment-gateways", "/admin/withdraw-methods", "/admin/notifications"];
+    if (!managerAllowedPaths.includes(location.pathname)) {
+      return <Navigate to="/admin/game-access" replace />;
+    }
+  }
+
+  if (requiredRole === "user" && role !== "user") {
+    return <Navigate to={role === "admin" || role === "manager" ? "/admin" : "/home"} replace />;
+  }
+
+  return <>{children}</>;
+}

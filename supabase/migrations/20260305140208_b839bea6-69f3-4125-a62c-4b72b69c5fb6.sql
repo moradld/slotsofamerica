@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN resend_from_email TEXT DEFAULT 'noreply@resend.dev';

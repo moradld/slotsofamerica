@@ -1,0 +1,25 @@
+project_id = "mgxcjmbpatmelvwvaqjt"
+
+[functions.custom-signup]
+verify_jwt = false
+
+[functions.custom-password-reset]
+verify_jwt = false
+
+[functions.create-staff]
+verify_jwt = false
+
+[functions.email-verify]
+verify_jwt = false
+
+[functions.phone-verify]
+verify_jwt = false
+
+[functions.send-test-email]
+verify_jwt = false
+
+[functions.send-transaction-email]
+verify_jwt = false
+
+[functions.trigger-email]
+verify_jwt = false

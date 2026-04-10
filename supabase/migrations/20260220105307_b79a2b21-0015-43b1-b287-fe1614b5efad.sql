@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_gateways ADD COLUMN IF NOT EXISTS logo_url text NULL;
