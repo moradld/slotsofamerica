@@ -1,0 +1,1 @@
+ALTER TABLE public.game_unlock_requests ADD COLUMN game_password text DEFAULT NULL;

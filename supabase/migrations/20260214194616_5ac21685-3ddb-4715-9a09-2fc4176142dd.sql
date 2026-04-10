@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN fonts JSONB DEFAULT '{"primary": "", "secondary": "", "button": ""}'::jsonb;

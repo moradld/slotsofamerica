@@ -1,0 +1,1 @@
+GRANT SELECT ON public.support_channels TO anon;
